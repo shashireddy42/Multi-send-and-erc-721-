@@ -29,8 +29,9 @@ contract Boxing is ERC721{
         _;
     }
     //Creating a new player by creator
-    function NewPlayer(string memory _name,uint _points,uint _grade) public {
+    function NewPlayer(string memory _name,uint _points) public {
          require(msg.sender == Creator, "Only game owner can create new Players");
+         Players[_id]=Boxer(_name,_id,_points,0);
         _safeMint(msg.sender,_id);
          _id++;
     }
@@ -48,21 +49,21 @@ contract Boxing is ERC721{
             defender.grade += 100;
         }
         else if(attacker.points==defender.points){
-            attacker.grade==50;
-            defender.grade==50;
+            attacker.grade+=50;
+            defender.grade+=50;
         }
     }
     //Users to set the price of Nft 
-    function allowBuy(uint _id,uint _price) public  {
+    function allowBuy(uint Bxrid,uint _price) public  {
     _price=_price*10**18;
     require(msg.sender == ownerOf(_id), "You are not holding the Boxer card");
        require(_price>= 1 ether,"Price must be greater than 1 ether");
-        PlayersPrice[_id] = _price;
+        PlayersPrice[Bxrid] = _price;
     }
     //To buy the nft by using ether
-      function buyPlayerCard(uint _id) payable public {
-        address seller = ownerOf(_id);
-        _transfer(seller, msg.sender, _id);
+      function buyPlayerCard(uint Bxrid) payable public {
+        address seller = ownerOf(Bxrid);
+        _transfer(seller, msg.sender, Bxrid);
          (bool sent,)=payable(seller).call{value:msg.value}(""); 
         require(sent,"Failed to send ether");
       }
