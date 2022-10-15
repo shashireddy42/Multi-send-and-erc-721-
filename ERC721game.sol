@@ -24,31 +24,37 @@ contract Boxing is ERC721{
     mapping (uint=>uint) public PlayersPrice; 
     uint internal _id=1001;
 
-     modifier onlyOwnerOf(uint _Creator) {
-        require(ownerOf(_Creator) == msg.sender, "Must be owner of Boxer to Play");
+     modifier onlyOwnerOf() {
+        require(Creator==msg.sender, "Must be owner of Boxer to Play");
         _;
     }
     //Creating a new player by creator
     function NewPlayer(string memory _name,uint _points) public {
          require(msg.sender == Creator, "Only game owner can create new Players");
-         Players[_id]=Boxer(_name,_id,_points,0);
-        _safeMint(msg.sender,_id);
+         Players[_id]=Boxer(_name,_id,_points,1000);
+        _safeMint(msg.sender,_id); 
          _id++;
     }
     //Game logic
-     function Game(uint _attackingBoxer, uint _defendingBoxer) public onlyOwnerOf(_attackingBoxer){
+     function Game(uint _attackingBoxer, uint _defendingBoxer) public onlyOwnerOf{
         Boxer storage attacker = Players[_attackingBoxer];
         Boxer storage defender = Players[_defendingBoxer];
-
+        
         if (attacker.points > defender.points) {
+            require(attacker.grade>0,"Attacker died");
+        require(defender.grade>0,"Defender died");
             attacker.grade += 100;
             defender.grade -= 50;
         }
         else if(attacker.points<defender.points){
+            require(attacker.grade>0,"Attacker died");
+        require(defender.grade>0,"Defender died");
             attacker.grade -= 50;
             defender.grade += 100;
         }
         else if(attacker.points==defender.points){
+            require(attacker.grade>0,"Attacker died");
+        require(defender.grade>0,"Defender died");
             attacker.grade+=50;
             defender.grade+=50;
         }
@@ -56,7 +62,7 @@ contract Boxing is ERC721{
     //Users to set the price of Nft 
     function allowBuy(uint Bxrid,uint _price) public  {
     _price=_price*10**18;
-    require(msg.sender == ownerOf(_id), "You are not holding the Boxer card");
+    require(msg.sender == ownerOf(Bxrid), "You are not holding the Boxer card");
        require(_price>= 1 ether,"Price must be greater than 1 ether");
         PlayersPrice[Bxrid] = _price;
     }
